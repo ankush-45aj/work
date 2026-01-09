@@ -76,7 +76,7 @@ function Task({ task, setTasks }) {
             style={style}
             {...listeners}
             {...attributes}
-            className={`group relative p-2 mb-1 rounded-md border-l-4 shadow-sm cursor-grab active:cursor-grabbing transition-all ${COLORS[task.category] || COLORS.Work
+            className={`draggable-task group relative p-2 mb-1 rounded-md border-l-4 shadow-sm cursor-grab active:cursor-grabbing transition-all ${COLORS[task.category] || COLORS.Work
                 } ${task.done ? 'opacity-40 grayscale' : ''}`}
         >
             <div className="flex justify-between items-start gap-2">

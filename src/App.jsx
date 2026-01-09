@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core';
 import Sidebar from './components/Sidebar';
 import Timeline from './components/Timeline';
 
@@ -12,7 +18,15 @@ export default function App() {
   // Necessary sensors to allow clicking icons without triggering drag immediately
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 }, // Task only drags after moving 5px
+      activationConstraint: {
+        distance: 5,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150,      // long-press on mobile
+        tolerance: 5,
+      },
     })
   );
 
