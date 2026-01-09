@@ -26,28 +26,34 @@ const COLORS = {
 ========================= */
 
 const generateWeekDays = (baseDate = new Date()) => {
-    const start = startOfWeek(baseDate, { weekStartsOn: 1 }); // Monday
+    const start = startOfWeek(baseDate, { weekStartsOn: 1 });
 
     return Array.from({ length: 7 }).map((_, i) => {
         const date = addDays(start, i);
 
         return {
-            label: format(date, 'EEE'),        // Mon, Tue
-            date: format(date, 'yyyy-MM-dd'),  // 2026-01-21
-            day: format(date, 'dd'),           // 21
+            label: format(date, 'EEE'),
+            date: format(date, 'yyyy-MM-dd'),
+            day: format(date, 'dd'),
             active: isToday(date),
         };
     });
 };
 
 /* =========================
-   TASK COMPONENT
+   TASK (DRAGGABLE)
 ========================= */
 
 function Task({ task, setTasks }) {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    const { isDragging, attributes, listeners, setNodeRef, transform } = useDraggable({
         id: task.id,
     });
+
+    const style = {
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        opacity: isDragging ? 0 : 1, // Hide the original while the Overlay is moving
+        touchAction: 'none'
+    };
 
     const handleDelete = (e) => {
         e.stopPropagation();
@@ -63,21 +69,17 @@ function Task({ task, setTasks }) {
         );
     };
 
-    const style = transform
-        ? {
-            transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-            zIndex: 50,
-        }
-        : undefined;
-
     return (
         <div
             ref={setNodeRef}
             style={style}
             {...listeners}
             {...attributes}
-            className={`draggable-task group relative p-2 mb-1 rounded-md border-l-4 shadow-sm cursor-grab active:cursor-grabbing transition-all ${COLORS[task.category] || COLORS.Work
-                } ${task.done ? 'opacity-40 grayscale' : ''}`}
+            onContextMenu={(e) => e.preventDefault()}
+            className={`draggable-task group relative p-2 mb-1 rounded-md border-l-4 shadow-sm cursor-grab active:cursor-grabbing transition-all
+        ${COLORS[task.category] || COLORS.Work}
+        ${task.done ? 'opacity-40 grayscale' : ''}
+      `}
         >
             <div className="flex justify-between items-start gap-2">
                 <span className="text-[11px] font-semibold leading-tight line-clamp-2">
@@ -107,8 +109,9 @@ function Cell({ id, children }) {
     return (
         <div
             ref={setNodeRef}
-            className={`min-h-[100px] border-b border-r border-gray-800/50 p-1 transition-colors ${isOver ? 'bg-white/5' : ''
-                }`}
+            className={`min-h-[100px] border-b border-r border-gray-800/50 p-1 transition-colors
+        ${isOver ? 'bg-white/5' : ''}
+      `}
         >
             {children}
         </div>
@@ -120,7 +123,7 @@ function Cell({ id, children }) {
 ========================= */
 
 export default function Timeline({ tasks, setTasks }) {
-    const DAYS = generateWeekDays(); // ✅ AUTO DAYS
+    const DAYS = generateWeekDays();
 
     return (
         <div className="flex-1 bg-[#16161e] overflow-auto">
@@ -138,9 +141,10 @@ export default function Timeline({ tasks, setTasks }) {
                         </span>
 
                         <span
-                            className={`inline-flex mt-1 w-8 h-8 items-center justify-center rounded-full font-bold ${d.active
-                                ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20'
-                                : 'text-gray-400'
+                            className={`inline-flex mt-1 w-8 h-8 items-center justify-center rounded-full font-bold
+                ${d.active
+                                    ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/20'
+                                    : 'text-gray-400'
                                 }`}
                         >
                             {d.day}
@@ -154,7 +158,7 @@ export default function Timeline({ tasks, setTasks }) {
                 {HOURS.map(hour => (
                     <React.Fragment key={hour}>
                         <div className="text-[10px] font-bold text-gray-600 text-right pr-4 pt-2 border-r border-gray-800/50 h-[100px]">
-                            {(hour > 12) ? `${hour - 12} PM` : `${hour} AM`}
+                            {hour > 12 ? `${hour - 12} PM` : `${hour} AM`}
                         </div>
 
                         {DAYS.map(day => (
